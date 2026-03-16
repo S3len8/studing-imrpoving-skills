@@ -1,46 +1,72 @@
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
-from fastapi import FastAPI
 import uvicorn
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from fastapi import FastAPI, Depends
+from pydantic import BaseModel
+from typing import Annotated
+from sqlalchemy import select
 
 app = FastAPI()
 
-user = {
-        'email': 'email@gmail.com',
-        'bio': "User",
-        'age': 12,
-    }
+engine = create_async_engine('sqlite+aiosqlite:///books.db') # Створення "движка" бази даних
 
 
-def func(user_: dict): # Функція яка виконує певні дії з даними словника
-    user_['age'] += 1
+new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-class UserSchema(BaseModel): # Створення схеми з наслідуванням до BaseModel
-    email: EmailStr # Валідація для емейлу
-    bio: str | None = Field(max_length=10) # Валідація для біо
-    # age: int = Field(ge=0, le=99999999999999999999) # Валідація для віку
-    model_config = ConfigDict(extra='forbid')
+# Генератор сесії
+async def get_session():
+    async with new_session() as session:
+        yield session
 
 
-class UserAgeSchema(UserSchema): # Створення схеми з наслідуванням до UserSchema
-    age: int = Field(ge=0, le=99999999999999999999) # Валідація для віку
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
+
+class Base(DeclarativeBase):
+    pass
 
 
-users = []
+class BookModel(Base):
+    __tablename__ = "books"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    author: Mapped[str]
 
 
-@app.post("/users")
-def add_user(user: UserSchema):
-    users.append(user)
-    return {"ok": True, "msg": "Користувач доданий"}
+@app.post("/setup_database")
+async def setup_database():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    return {"ok": True}
 
 
-@app.get("/users")
-def get_user():
-    return users
+class BookAddSchema(BaseModel):
+    title: str
+    author: str
+
+
+class BookSchema(BookAddSchema):
+    id: int
+
+@app.post("/books")
+async def add_book(data: BookAddSchema, session: SessionDep):
+    new_book = BookModel(
+        title=data.title,
+        author=data.author,
+    )
+    session.add(new_book)
+    await session.commit()
+    return {"ok": True}
+
+
+@app.get("/books")
+async def get_books(session: SessionDep):
+    query = select(BookModel)
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
-    print(UserAgeSchema(**user))
-    print(UserSchema(**user)) # Розкриття даних з словнику як **kwargs
+    uvicorn.run("main:app", reload=False)
