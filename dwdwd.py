@@ -1,19 +1,15 @@
-nums = [-1,0,3,5,9,12]
-target = 9
+nums = [2,2]
+target = 4
 
 
 class Solution:
-    def search(self, nums: list[int], target: int) -> int:
-        if 1 <= len(nums) <= 10**4:
-            for i in nums:
-                if (-10**4 >= i or i >= 10**4) or (-10**4 >= target or target >= 10**4):
-                    return -1
-                if i == target:
-                    return nums.index(i)
-                if target not in nums:
-                    return -1
+    def two_sum(self, nums: list[int], target: int) -> list[int]:
+        for i in range(len(nums)):
+            for j in range(i + 1, len(nums)):
+                if 2 <= len(nums) <= 10 ** 4 and -10 ** 9 <= nums[i] <= 10 ** 9 and -10 ** 9 <= target <= 10 ** 9:
+                    if nums[i] + nums[j] == target:
+                        return [i, j]
 
 
 solution = Solution()
-print(solution.search(nums, target))
-
+print(solution.two_sum(nums, target))
