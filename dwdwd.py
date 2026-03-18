@@ -9,7 +9,10 @@ class Solution:
     """
     def climb_stairs(self, n: int) -> int: # Use Fibonacci formula for solve this exercise
         t = n - 2
-        if 1 <= n <= 45:
+        if n == 1:
+            summary_of_variants = n
+            return summary_of_variants
+        if 2 <= n <= 45:
             summary_of_variants = (t**2 + t + 4) / 2
             return int(summary_of_variants)
 
