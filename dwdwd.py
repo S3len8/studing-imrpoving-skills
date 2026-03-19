@@ -1,24 +1,17 @@
-n = 5
+import re
+
+s = "A man, a plan, a canal: Panama"
 
 
 class Solution:
-    """
-    Main idea would be like find iteration as n - 2 and after iteration + last summary of variants past iteration,
-    but I really don`t know how realize this version in code. But Gemini helps me and give idea about Fibonacci numbers
-    and his formula to solve this exercise.
-    """
-    def climb_stairs(self, n: int) -> int: # Use Fibonacci formula for solve this exercise
-        for i in range(n):
-            for j in range(i+1, n):
-                if n == 1 or n == 2:
-                    return n
-                if n > 2:
-                    t = 2
-                    summary = t + j
-                    print(t, j, i)
-                    print(summary)
-
+    def is_palindrome(self, s: str) -> bool:
+        if 1 <= len(s) <= 2*10**5:
+            clear_str = re.sub(r'[^a-zA-Z0-9\s]', '', s).lower().replace(" ", "")
+            if clear_str == "".join(reversed(clear_str)):
+                return True
+            return False
+        return True
 
 
 solution = Solution()
-print(solution.climb_stairs(n))
+print(solution.is_palindrome(s))
