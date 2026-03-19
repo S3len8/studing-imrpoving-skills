@@ -1,4 +1,4 @@
-n = 2
+n = 5
 
 
 class Solution:
@@ -8,13 +8,16 @@ class Solution:
     and his formula to solve this exercise.
     """
     def climb_stairs(self, n: int) -> int: # Use Fibonacci formula for solve this exercise
-        t = n - 2
-        if n == 1:
-            summary_of_variants = n
-            return summary_of_variants
-        if 2 <= n <= 45:
-            summary_of_variants = (t**2 + t + 4) / 2
-            return int(summary_of_variants)
+        for i in range(n):
+            for j in range(i+1, n):
+                if n == 1 or n == 2:
+                    return n
+                if n > 2:
+                    t = 2
+                    summary = t + j
+                    print(t, j, i)
+                    print(summary)
+
 
 
 solution = Solution()
