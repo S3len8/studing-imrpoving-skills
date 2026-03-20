@@ -1,37 +1,29 @@
-from fastapi import FastAPI, HTTPException, Response, Depends
-from authx import AuthX, AuthXConfig
-from pydantic import BaseModel, Field
-import uvicorn
+import time
+import asyncio
 
+import uvicorn
+from fastapi import FastAPI, BackgroundTasks
 
 app = FastAPI()
 
-config = AuthXConfig()
-config.JWT_SECRET_KEY = "SECRET_KEY"
-config.JWT_ACCESS_COOKIE_NAME = "my_access_token"
-config.JWT_TOKEN_LOCATION = ["cookies"]
 
-security = AuthX(config=config)
+def sync_func():
+    time.sleep(5)
+    print("sync_func")
 
 
-class UserLoginSchema(BaseModel):
-    username: str
-    password: str
+async def async_func():
+    await asyncio.sleep(5)
+    print("async_func")
 
 
-@app.post("/login")
-def login(credentials: UserLoginSchema, response: Response):
-    if credentials.username == "test" and credentials.password == "test":
-        token = security.create_access_token(uid="12345678")
-        response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
-        return {"access_token": token}
-    raise HTTPException(status_code=401, detail="Incorrect username and password")
-
-
-@app.get("/protected", dependencies=[Depends(security.access_token_required)])
-def protected():
-    return {"data": "Top secret"}
+@app.post("/")
+async def some_route(back_ground_tasks: BackgroundTasks):
+    ...
+    # asyncio.create_task(async_func())
+    back_ground_tasks.add_task(sync_func)
+    return {"ok": True}
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", reload=False)
