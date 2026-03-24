@@ -1,42 +1,50 @@
+from fastapi import FastAPI, HTTPException
 import uvicorn
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import StreamingResponse, FileResponse
+from pydantic import BaseModel
 
 app = FastAPI()
 
-
-@app.post("/upload_files")
-async def upload_files(uploaded_file: UploadFile):
-    file = uploaded_file.file
-    filename = uploaded_file.filename
-    with open(f"1_{filename}", "wb") as f:
-        f.write(file.read())
-
-
-@app.post("/many_upload_files")
-async def upload_files(uploaded_files: list[UploadFile]):
-    for uploaded_file in uploaded_files:
-        file = uploaded_file.file
-        filename = uploaded_file.filename
-        with open(f"1_{filename}", "wb") as f:
-            f.write(file.read())
+books = [
+    {
+        'id': 1,
+        'title': "First Book",
+        'author': 'User 1',
+    },
+    {
+        'id': 2,
+        'title': "Second Book",
+        'author': 'User 2',
+    },
+]
 
 
-@app.get("/files/{filename}")
-async def get_file(filename: str):
-    return FileResponse(filename)
+@app.get("/books", tags=["Книги"], summary="Книги")
+def read_books():
+    return books
 
 
-def iterfile(filename: str):
-    with open(f"{filename}", "rb") as f:
-        while chunk := f.read(1024 * 1024):
-            yield chunk
+@app.get("/books/{book_id}", tags=["Книги"], summary="Кожна книга")
+def get_book(book_id: int):
+    for book in books:
+        if book['id'] == book_id:
+            return book
+        raise HTTPException(status_code=404, detail="Книги не знайдено")
 
 
-@app.get("/files/streaming/{filename}")
-async def get_streaming_file(filename: str):
-    return StreamingResponse(iterfile(filename), media_type="video/mp4")
+class NewBook(BaseModel):
+    title: str
+    author: str
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", reload=False)
+@app.post("/books", tags=['Книги'])
+def create_book(new_book: NewBook):
+    books.append({
+        "id": len(books) + 1,
+        "title": new_book.title,
+        "author": new_book.author,
+    })
+    return {"success": True, "message": "Книга додана"}
+
+
+if __name__ == '__main__':
+    uvicorn.run("main:app", reload=True)
