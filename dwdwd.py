@@ -12,16 +12,16 @@ class Solution:
                     nums.remove(0)
                     nums.append(0)
 
+                    # count_nums = nums.count(0)
+        # i = 0
+        # while i < count_nums:
+        #     print(i)
+        #     nums.pop(0)
+        #     nums.append(0)
+        #     i += 1
+
         print(nums)
 
 
 solution = Solution()
 print(solution.moveZeroes(nums))
-
-# count_nums = nums.count(0)
-# i = 0
-# while i < count_nums:
-#     print(i)
-#     nums.pop(0)
-#     nums.append(0)
-#     i += 1
