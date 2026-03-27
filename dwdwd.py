@@ -1,27 +1,15 @@
-nums = [0,1,0,3,12]
+str1 = "ABCABC"
+str2 = "ABC"
 
 
 class Solution:
-    def moveZeroes(self, nums: list[int]) -> None:
-        """
-        Возврат значения не требуется, все изменения выполняются на месте.
-        """
-        if 1 <= len(nums) <= 10**4:
-            for num in nums:
-                if num == 0 and -2**31 <= nums[num] <= 2**31 - 1:
-                    nums.remove(0)
-                    nums.append(0)
-
-                    # count_nums = nums.count(0)
-        # i = 0
-        # while i < count_nums:
-        #     print(i)
-        #     nums.pop(0)
-        #     nums.append(0)
-        #     i += 1
-
-        print(nums)
+    def gcd_of_strings(self, str1: str, str2: str) -> str:
+        liststr1 = [letter for letter in str1]
+        liststr2 = [letter for letter in str2]
+        liststr3 = liststr1.count(liststr2)
+        print(liststr3)
+        print(liststr1, liststr2)
 
 
 solution = Solution()
-print(solution.moveZeroes(nums))
+print(solution.gcd_of_strings(str1, str2))
