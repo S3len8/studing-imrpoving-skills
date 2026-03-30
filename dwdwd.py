@@ -1,33 +1,24 @@
-def my_range(*args: int, **kwargs: int) -> int:
-    if len(args) == 1:
-        start = 0
-        stop = args[0]
-        step = 1
-        while stop > start:
-            yield start
-            start += step
-    if len(args) == 2:
-        start = args[0]
-        stop = args[1]
-        step = 1
-        while stop > start:
-            yield start
-            start += step
-    if len(args) == 3:
-        start = args[0]
-        stop = args[1]
-        step = args[2]
-        if step > 0:
-            while stop > start:
-                yield start
-                start += step
-        if step < 0:
-            while start > stop:
-                yield start
-                start += step
-        if step == 0:
-            raise ValueError
+height = [1,2,4,3]
 
 
-range = my_range(9)
-print(list(range))
+class Solution:
+    def max_area(self, height: list[int]) -> int:
+        result = []
+        for i in range(len(height)):
+            for j in range(i + 1, len(height)):
+                if 2 <= len(height) <= 10**5 and 0 <= height[i] <= 10**4:
+                    length = j - i
+                    if height[i] >= height[j]:
+                        area = height[j] * length
+                        result.append(area)
+                    if height[j] >= height[i]:
+                        area = height[i] * length
+                        result.append(area)
+                    if len(height) <= 2:
+                        area = min(height) * 1
+                        result.append(area)
+        return max(result, default=0)
+
+
+solution = Solution()
+print(solution.max_area(height))
