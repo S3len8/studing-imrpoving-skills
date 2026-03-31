@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список книг</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .book {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Список книг</h1>
+<div id="books"></div>
+
+<script>
+    async function loadBooks() {
+        try {
+            const response = await fetch('http://127.0.0.1:8088/books');
+            const books = await response.json();
+
+            const container = document.getElementById('books');
+            container.innerHTML = '';
+
+            books.forEach(book => {
+                const div = document.createElement('div');
+                div.className = 'book';
+
+                div.innerHTML = `
+                    <strong>${book.title || 'Без названия'}</strong><br>
+                    Автор: ${book.author || 'Не указан'}<br>
+                    ID: ${book.id || '—'}
+                `;
+
+                container.appendChild(div);
+            });
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+            document.getElementById('books').innerHTML = 'Ошибка загрузки данных';
+        }
+    }
+
+    loadBooks();
+</script>
+
+</body>
+</html>
