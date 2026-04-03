@@ -1,3 +1,4 @@
+import time
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -28,6 +29,7 @@ async def add_book(data: BookAddSchema, session: SessionDep):
     )
     session.add(new_book)
     await session.commit()
+    time.sleep(0.5)
     return {"ok": True}
 
 
