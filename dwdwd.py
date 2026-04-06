@@ -1,49 +1,131 @@
+# def deco():
+#     ...
+#
+#
+# @deco # Перший варіант як можна застосувати декоратор синтаксичний цукор
+# def my_func():
+#     return 123
+#
+#
+# my_func = deco(my_func) # Другий варіант як можна створити декоратор
+# from collections.abc import Callable
+#
+#
+# def empty_deco(func: Callable):
+#     def wrapper():
+#         res = func()
+#         return res
+#     return wrapper
+#
+# @empty_deco
+# def my_func():
+#     return 123
+#
+# print(my_func())
+
+# from collections.abc import Callable
+# import time
+#
+# def timer_deco(func: Callable):
+#     def wrapper():
+#         start = time.perf_counter()
+#         res = func()
+#         end = time.perf_counter()
+#         print(f"Виконання зайняло: {end-start}")
+#         return res
+#     return wrapper
+#
+# @timer_deco
+# def my_func():
+#     time.sleep(1)
+#     return 123
+#
+# print(my_func())
+
+
+# from collections.abc import Callable
+# import time
+#
+# def param_timer_deco(func: Callable):
+#     def wrapper(*args, **kwargs):
+#         start = time.perf_counter()
+#         res = func(*args, **kwargs)
+#         end = time.perf_counter()
+#         print(f"Виконання зайняло: {end-start}")
+#         return res
+#     return wrapper
+#
+# @param_timer_deco
+# def my_func(sleep_time: int):
+#     time.sleep(sleep_time)
+#     return 123
+#
+# print(my_func(3))
+
+
+# from collections.abc import Callable
+# import time
+# from functools import wraps
+#
+# def limit_calls(limit: int):
+#     def wrapper(func: Callable):
+#         @wraps(func)
+#         def inner(*args, **kwargs):
+#             """Лол другий докстрінг тримай"""
+#             nonlocal limit
+#             if limit == 0:
+#                 print("Неможна користуватися функцією")
+#                 return
+#
+#             res = func(*args, **kwargs)
+#             limit -= 1
+#             return res
+#         return inner
+#     return wrapper
+#
+#
+# @limit_calls(2)
+# def my_func(sleep_time: int):
+#     """Дуже важливий докстірнг не загуби"""
+#     time.sleep(sleep_time)
+#     return 123
+#
+# print(my_func.__doc__)
+# print(my_func.__name__)
+
+
+import time
+# from functools import wraps
+# from typing import Coroutine
+# import asyncio
+#
+#
+# def deco(coroutine: Coroutine):
+#     @wraps(coroutine)
+#     async def wrapper(*args, **kwargs):
+#         res = await coroutine(*args, **kwargs)
+#         return res
+#     return wrapper
+#
+#
+# @deco
+# async def async_my_func():
+#     """Дуже важливий докстірнг не загуби"""
+#     await asyncio.sleep(0.5)
+#     return 123
+#
+#
+# print(asyncio.run(async_my_func()))
+
+
 from typing import Callable
 from functools import wraps
 
-error_counter_success = 0
+def log_func(func: Callable):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f"func: {func.__name__}, args: {args}, kwargs: {kwargs}")
+        res = func(*args, **kwargs)
+        return res
+    return wrapper 
 
-
-def retry_on_exception(retries: int):
-    def wrapper(func: Callable):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            i = 1
-            while i <= retries:
-                try:
-                    result = func(*args, **kwargs)
-                    print(f"ok")
-                    i += 1
-                    return result
-                except Exception as e:
-                    if i < retries:
-                        print(f"{type(e).__name__}")
-                    else:
-                        print(f"final {type(e).__name__}")
-                    i += 1
-        return inner
-    return wrapper
-
-
-@retry_on_exception(retries=3)
-def test_success_after_one_fail():
-    global error_counter_success
-    if error_counter_success < 2:
-        error_counter_success += 1
-        raise ValueError
-    return "Success after fail!"
-
-
-@retry_on_exception(retries=3)
-def test_fail_all_attempts():
-    raise AttributeError
-
-
-@retry_on_exception(retries=3)
-def test_success_immediately():
-    return "Success Immediately!"
-
-
-test_success_immediately()
-test_fail_all_attempts()
-test_success_after_one_fail()
