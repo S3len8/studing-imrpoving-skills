@@ -1,37 +1,33 @@
-from typing import Callable
-from functools import wraps
+import math
+piles = [3, 6, 7, 11]
+h = 8
 
-def add_tag(tag: str):
-    def wrapper(func: Callable):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            res = func(*args, **kwargs)
-            return f"<{tag}>{res}</{tag}>"
-        return inner
-    return wrapper
 
-def add_div(func: Callable):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        res = func(*args, **kwargs)
-        return f"<div>{res}</div>"
-    return wrapper
+class Solution:
+    def min_eating_speed(self, piles: list[int], h: int) -> int:
+        sum_banana = 0
+        for banana in piles:
+            sum_banana += banana
 
-@add_tag("h2")
-def greeting(name: str) -> str:
-    return f"Hello, {name}!"
+        if len(piles) < h:
+            nim_time_eating = sum_banana / h
+            return math.ceil(nim_time_eating)
 
-print(greeting("Anton"))  # <h2>Hello, Anton!</h2>
+        if len(piles) == h:
+            nim_time_eating = max(piles)
+            return math.ceil(nim_time_eating)
 
-@add_div
-def greeting(name: str) -> str:
-    return f"Hello, {name}!"
+        # if len(piles) < h:
+        #     half_max_one = max(piles) / 2
+        #     hals_max_two = max(piles) / 2
+        #     for i in range(len(piles)):
+        #         if  piles[i] == max(piles):
+        #             piles[i] = half_max_one
+        #             piles.append(hals_max_two)
+        #
+        #     nim_time_eating = max(piles)
+        #     return math.ceil(nim_time_eating)
 
-print(greeting("Grisha"))  # <div>Hello, Grisha!</div>
 
-@add_tag("h2")
-@add_div
-def greeting(name: str) -> str:
-    return f"Hello, {name}!"
-
-print(greeting("Maksim"))  # <h2><div>Hello, Maksim!</div></h2>
+solution = Solution()
+print(solution.min_eating_speed(piles, h))
