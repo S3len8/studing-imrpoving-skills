@@ -1,22 +1,14 @@
-class Home():
-    default_wall_material = "Кирпич"
+nums = [-2,1,-3,4,-1,2,1,-5,4]
+class Solution:
+    def max_sub_array(self, nums: list[int]) -> int:
+        current_sum = max_total = nums[0]
 
-    def __init__(self, color, floors, sec_code):
-        self.color = color # Public attribute
-        self._floors = floors # Secure attribute
-        self.__sec_code = sec_code # Private attribute
+        for x in nums[1:]:
+            current_sum = max(x, current_sum + x)
+            max_total = max(max_total, current_sum)
 
-    def describe(self):
-        print(f"House: {self.color}, Floors: {self._floors}, Sec Code: {self.__sec_code}")
-
-    def repaint(self, new_color):
-        self.color = new_color
-        print(f"Paint house: {self.color}")
+        return max_total
 
 
-h1 = Home("White", 15, 893123)
-# h2 = Home("Orange", 11, 1231311)
-
-print(h1.color)
-print(h1._floors)
-print(h1.__sec_code)
+solution = Solution()
+print(solution.max_sub_array(nums))
